@@ -1,3 +1,4 @@
+using System;
 using StateMachine.Abstractions;
 
 namespace StateMachine

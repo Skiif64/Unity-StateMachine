@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using StateMachine.Abstractions;
@@ -6,8 +7,9 @@ namespace StateMachine
 {
     public class StateMachine<TContext>
     {
+        private readonly HashSet<Transition<TContext>> _anyTransition = new();
         private readonly ConcurrentDictionary<IState<TContext>, List<Transition<TContext>>> _transitions = new();
-        
+        private readonly ConcurrentDictionary<Type, IState<TContext>> _states = new();
         public IState<TContext> CurrentState { get; private set; } = StateBase<TContext>.Null;
 
         public void Init(IState<TContext> initialState)
@@ -27,15 +29,33 @@ namespace StateMachine
             newState.OnEnter();
         }
 
-        public void AddTransition(Transition<TContext> transition)
+        public TState GetStateOrDefault<TState>() where TState : IState<TContext>
         {
-            _transitions.AddOrUpdate(transition.TargetState,
+            if (!_states.TryGetValue(typeof(TState), out var state))
+            {
+                return default;
+            }
+
+            return (TState)state;
+        }
+
+        public void FromState(IState<TContext> from, Transition<TContext> transition)
+        {
+            _states.TryAdd(from.GetType(), from);
+            _states.TryAdd(transition.TransitionTo.GetType(), transition.TransitionTo);
+            _transitions.AddOrUpdate(from,
                 _ => new List<Transition<TContext>>() { transition },
                 (_, transitions) =>
                 {
                     transitions.Add(transition);
                     return transitions;
                 });
+        }
+
+        public void AnyState(Transition<TContext> transition)
+        {
+            _states.TryAdd(transition.TransitionTo.GetType(), transition.TransitionTo);
+            _anyTransition.Add(transition);
         }
         
         internal void Enter(IState<TContext> state)
@@ -52,6 +72,14 @@ namespace StateMachine
         private void TryTransitions()
         {
             if (!CurrentState.CanExit) return;
+
+            foreach (var transition in _anyTransition)
+            {
+                if (!transition.IsSatisfied(this)) continue;
+                
+                SwitchState(transition.TransitionTo);
+                break;
+            }
             
             foreach (var transition in _transitions[CurrentState])
             {

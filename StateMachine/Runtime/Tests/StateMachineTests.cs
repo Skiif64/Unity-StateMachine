@@ -34,7 +34,7 @@ public class StateMachineTests
         var state1 = new MockState1(_context);
         var state2 = new MockState2(_context);
         
-        _stateMachine.AddTransition(new Transition<MockContext>(state1, state2, () => _context.Flag1));
+        _stateMachine.FromState(state1, new Transition<MockContext>(state2, () => _context.Flag1));
         
         _stateMachine.Init(state1);
 
@@ -50,7 +50,7 @@ public class StateMachineTests
         var state1 = new MockState1(_context);
         var state2 = new MockState2(_context);
         
-        _stateMachine.AddTransition(new Transition<MockContext>(state1, state2, () => _context.Flag1));
+        _stateMachine.FromState(state1, new Transition<MockContext>(state2, () => _context.Flag1));
         _stateMachine.Init(state1);
 
         _stateMachine.Update();

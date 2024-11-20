@@ -28,7 +28,7 @@ namespace StateMachine
 
         public void AddTransition(Transition<TContext> transition)
         {
-            ChildStateMachine.AddTransition(transition);
+            ChildStateMachine.AnyState(transition);
         }
        
 
