@@ -1,9 +1,9 @@
 using System;
 using StateMachine.Abstractions;
 
-namespace StateMachine
+namespace StateMachine.Transitions
 {
-    public readonly struct Transition<TContext>
+    public readonly partial struct Transition<TContext> : ITransition<TContext>
     {
         public IState<TContext> TransitionTo { get; }
         private readonly Func<bool> _condition;
@@ -14,7 +14,7 @@ namespace StateMachine
             _condition = condition;
         }
         
-        public bool IsSatisfied(StateMachine<TContext> stateMachine)
+        public bool IsSatisfied(IStateMachine<TContext> stateMachine)
         {
             return _condition();
         }

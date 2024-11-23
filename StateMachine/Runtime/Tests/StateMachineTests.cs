@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using StateMachine;
 using StateMachine.Runtime.Tests.Fixtures;
+using StateMachine.Transitions;
 using UnityEngine;
 using UnityEngine.TestTools;
 

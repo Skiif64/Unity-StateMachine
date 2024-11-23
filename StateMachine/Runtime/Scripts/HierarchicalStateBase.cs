@@ -5,7 +5,7 @@ using StateMachine.Abstractions;
 
 namespace StateMachine
 {
-    public abstract class HierarchicalStateBase<TContext> : IState<TContext>
+    public abstract class HierarchicalStateBase<TContext> : IState<TContext>, ITransitionable<TContext>
     {
         private bool _canExit = true;
         protected StateMachine<TContext> ChildStateMachine { get; }
@@ -26,9 +26,14 @@ namespace StateMachine
             InitialState = initialState;
         }
 
-        public void AddTransition(Transition<TContext> transition)
+        public void AnyState(ITransition<TContext> transition)
         {
             ChildStateMachine.AnyState(transition);
+        }
+        
+        public void FromState(IState<TContext> from, ITransition<TContext> transition)
+        {
+            ChildStateMachine.FromState(from, transition);
         }
        
 

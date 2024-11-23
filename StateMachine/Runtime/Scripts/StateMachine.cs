@@ -5,10 +5,10 @@ using StateMachine.Abstractions;
 
 namespace StateMachine
 {
-    public class StateMachine<TContext>
+    public class StateMachine<TContext> : IStateMachine<TContext>
     {
-        private readonly HashSet<Transition<TContext>> _anyTransition = new();
-        private readonly ConcurrentDictionary<IState<TContext>, List<Transition<TContext>>> _transitions = new();
+        private readonly HashSet<ITransition<TContext>> _anyTransition = new();
+        private readonly ConcurrentDictionary<IState<TContext>, List<ITransition<TContext>>> _transitions = new();
         private readonly ConcurrentDictionary<Type, IState<TContext>> _states = new();
         public IState<TContext> CurrentState { get; private set; } = StateBase<TContext>.Null;
 
@@ -39,12 +39,12 @@ namespace StateMachine
             return (TState)state;
         }
 
-        public void FromState(IState<TContext> from, Transition<TContext> transition)
+        public void FromState(IState<TContext> from, ITransition<TContext> transition)
         {
             _states.TryAdd(from.GetType(), from);
             _states.TryAdd(transition.TransitionTo.GetType(), transition.TransitionTo);
             _transitions.AddOrUpdate(from,
-                _ => new List<Transition<TContext>>() { transition },
+                _ => new List<ITransition<TContext>>() { transition },
                 (_, transitions) =>
                 {
                     transitions.Add(transition);
@@ -52,7 +52,7 @@ namespace StateMachine
                 });
         }
 
-        public void AnyState(Transition<TContext> transition)
+        public void AnyState(ITransition<TContext> transition)
         {
             _states.TryAdd(transition.TransitionTo.GetType(), transition.TransitionTo);
             _anyTransition.Add(transition);

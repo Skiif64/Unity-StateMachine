@@ -7,4 +7,10 @@ namespace StateMachine.Abstractions
         void OnUpdate();
         void OnExit();
     }
+
+    public interface IState<TParent, TContext> : IState<TContext>
+        where TParent : IState<TContext>
+    {
+        TParent Parent { get; }
+    }
 }
