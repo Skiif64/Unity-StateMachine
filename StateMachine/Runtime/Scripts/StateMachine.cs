@@ -80,8 +80,13 @@ namespace StateMachine
                 SwitchState(transition.TransitionTo);
                 break;
             }
+
+            if (!_transitions.TryGetValue(CurrentState, out var currentTransitions))
+            {
+                return; //TODO: log this case?
+            }
             
-            foreach (var transition in _transitions[CurrentState])
+            foreach (var transition in currentTransitions)
             {
                 if (!transition.IsSatisfied(this)) continue;
                 
