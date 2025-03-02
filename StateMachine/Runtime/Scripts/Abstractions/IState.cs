@@ -5,6 +5,7 @@ namespace StateMachine.Abstractions
         bool CanExit { get; }
         void OnEnter();
         void OnUpdate();
+        void OnFixedUpdate();
         void OnExit();
     }
 

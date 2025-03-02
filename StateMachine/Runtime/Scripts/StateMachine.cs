@@ -22,8 +22,18 @@ namespace StateMachine
             CurrentState.OnUpdate();
         }
         
+        public void FixedUpdate()
+        {
+            CurrentState.OnFixedUpdate();
+        }
+        
         public void SwitchState(IState<TContext> newState)
         {
+            if (newState.Equals(CurrentState))
+            {
+                return;
+            }
+            
             CurrentState.OnExit();
             CurrentState = newState;
             newState.OnEnter();

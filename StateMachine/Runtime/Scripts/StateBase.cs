@@ -19,6 +19,10 @@ namespace StateMachine
         public virtual void OnUpdate()
         {
         }
+        
+        public virtual void OnFixedUpdate()
+        {
+        }
 
         public virtual void OnExit()
         {

@@ -45,6 +45,10 @@ namespace StateMachine
         {
         }
         
+        protected virtual void OnFixedUpdate()
+        {
+        }
+        
         protected virtual void OnExit()
         {
         }
@@ -59,6 +63,12 @@ namespace StateMachine
         {
             OnUpdate();
             ChildStateMachine.Update();
+        }
+        
+        void IState<TContext>.OnFixedUpdate()
+        {
+            OnFixedUpdate();
+            ChildStateMachine.FixedUpdate();
         }
 
         void IState<TContext>.OnExit()
