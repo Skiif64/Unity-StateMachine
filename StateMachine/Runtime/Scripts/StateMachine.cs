@@ -85,6 +85,11 @@ namespace StateMachine
 
             foreach (var transition in _anyTransition)
             {
+                if (CurrentState.Equals(transition.TransitionTo))
+                {
+                    continue;    
+                }
+                
                 if (!transition.IsSatisfied(this)) continue;
                 
                 SwitchState(transition.TransitionTo);
