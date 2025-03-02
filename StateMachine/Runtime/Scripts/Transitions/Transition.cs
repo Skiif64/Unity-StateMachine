@@ -3,7 +3,7 @@ using StateMachine.Abstractions;
 
 namespace StateMachine.Transitions
 {
-    public readonly partial struct Transition<TContext> : ITransition<TContext>
+    public readonly struct Transition<TContext> : ITransition<TContext>
     {
         public IState<TContext> TransitionTo { get; }
         private readonly Func<bool> _condition;
