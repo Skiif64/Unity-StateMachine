@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using StateMachine;
 using StateMachine.Abstractions;
 
 namespace StateMachine
@@ -76,5 +73,22 @@ namespace StateMachine
             OnExit();
             ChildStateMachine.Exit();
         }
+    }
+
+    public abstract class HierarchicalStateBase<TParent, TContext> : HierarchicalStateBase<TContext>,
+        IState<TParent, TContext>
+        where TParent : IState<TContext>
+    {
+        public TParent Parent { get; }
+        
+        protected HierarchicalStateBase(
+            TContext context,
+            TParent parent,
+            IState<TContext> initialState) 
+            : base(context, initialState)
+        {
+            Parent = parent;
+        }
+
     }
 }
