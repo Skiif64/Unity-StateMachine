@@ -89,6 +89,30 @@ namespace StateMachine
         {
             Parent = parent;
         }
+        
+        void IState<TContext>.OnEnter()
+        {
+            ChildStateMachine.Enter(InitialState);
+            OnEnter();
+        }
+
+        void IState<TContext>.OnUpdate()
+        {
+            OnUpdate();
+            ChildStateMachine.Update();
+        }
+        
+        void IState<TContext>.OnFixedUpdate()
+        {
+            OnFixedUpdate();
+            ChildStateMachine.FixedUpdate();
+        }
+
+        void IState<TContext>.OnExit()
+        {
+            OnExit();
+            ChildStateMachine.Exit();
+        }
 
     }
 }
