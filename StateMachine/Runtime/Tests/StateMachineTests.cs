@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using StateMachine;
+using StateMachine.Abstractions;
 using StateMachine.Runtime.Tests.Fixtures;
 using StateMachine.Transitions;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class StateMachineTests
         _stateMachine.Init(state1);
 
         _context.Flag1 = true;
-        _stateMachine.Update();
+        _stateMachine.CheckTransitions();
         Assert.That(_stateMachine.CurrentState, Is.TypeOf<MockState2>());
         
     }
@@ -54,8 +55,25 @@ public class StateMachineTests
         _stateMachine.FromState(state1, new Transition<MockContext>(state2, () => _context.Flag1));
         _stateMachine.Init(state1);
 
-        _stateMachine.Update();
+        _stateMachine.CheckTransitions();
         Assert.That(_stateMachine.CurrentState, Is.TypeOf<MockState1>());
         
+    }
+
+    [Test]
+    public void InnerState_TransitionShouldCheck()
+    {
+        var state1 = new MockState1(_context);
+        var state2 = new MockHierarchicalState(_context, state1);
+        
+        _stateMachine.AnyState(new Transition<MockContext>(state2, () => true));
+        
+        _stateMachine.Init(state2);
+
+        _context.Flag2 = true;
+        
+        _stateMachine.CheckTransitions();
+        
+        Assert.That(((IStateMachine<MockContext>)_stateMachine.CurrentState).CurrentState, Is.TypeOf<MockState2>());
     }
 }
