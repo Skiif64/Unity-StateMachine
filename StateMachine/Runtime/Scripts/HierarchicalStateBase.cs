@@ -1,13 +1,23 @@
+using System;
 using StateMachine.Abstractions;
 
 namespace StateMachine
 {
-    public abstract class HierarchicalStateBase<TContext> : IState<TContext>, ITransitionable<TContext>
+    public abstract class HierarchicalStateBase<TContext> : IState<TContext>, IStateMachine<TContext>, IDisposable
     {
         protected StateMachine<TContext> ChildStateMachine { get; }
         protected IState<TContext> InitialState { get; }
         protected TContext Context { get; }
 
+        public IState<TContext> CurrentState => ChildStateMachine.CurrentState;
+
+        protected HierarchicalStateBase(TContext context, IState<TContext> initialState, IStateMachineTicker ticker)
+        {
+            ChildStateMachine = new StateMachine<TContext>(ticker);
+            Context = context;
+            InitialState = initialState;
+        }
+        
         protected HierarchicalStateBase(TContext context, IState<TContext> initialState)
         {
             ChildStateMachine = new StateMachine<TContext>();
@@ -24,6 +34,16 @@ namespace StateMachine
         {
             ChildStateMachine.FromState(from, transition);
         }
+        
+        public void Init(IState<TContext> initialState) => ChildStateMachine.Init(initialState);
+
+        public void Update() => ChildStateMachine.Update();
+
+        public void FixedUpdate() => ChildStateMachine.FixedUpdate();
+
+        public void CheckTransitions() => ChildStateMachine.CheckTransitions();
+
+        public void SwitchState(IState<TContext> newState) => ChildStateMachine.SwitchState(newState);
 
         public virtual bool CanExit() => true;
 
@@ -52,13 +72,13 @@ namespace StateMachine
         void IState<TContext>.OnUpdate()
         {
             OnUpdate();
-            ChildStateMachine.Update();
+            Update();
         }
         
         void IState<TContext>.OnFixedUpdate()
         {
             OnFixedUpdate();
-            ChildStateMachine.FixedUpdate();
+            FixedUpdate();
         }
 
         void IState<TContext>.OnExit()
@@ -67,10 +87,11 @@ namespace StateMachine
             ChildStateMachine.Exit();
         }
 
-        bool IState<TContext>.CanExit()
+        bool IState<TContext>.CanExit() => CanExit();
+
+        public void Dispose()
         {
-            ChildStateMachine.CheckTransitions(); //TODO: not good to use can exit as inner state machine check
-            return CanExit();
+            ChildStateMachine?.Dispose();
         }
     }
 

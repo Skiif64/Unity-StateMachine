@@ -27,6 +27,7 @@ namespace StateMachine
 
         public void Init(IState<TContext> initialState)
         {
+            _updateSubscription = _ticker.Subscribe(this);
             Enter(initialState);
         }
         public void Update()
@@ -135,6 +136,15 @@ namespace StateMachine
 
         public void Dispose()
         {
+            _updateSubscription.Dispose();
+
+            foreach (var (_, state) in _states)
+            {
+                if (state is IDisposable disposable)
+                {
+                    disposable?.Dispose();
+                }
+            }
             
         }
     }
