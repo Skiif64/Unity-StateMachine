@@ -8,13 +8,6 @@ namespace StateMachine
         protected StateMachine<TContext> ChildStateMachine { get; }
         protected IState<TContext> InitialState { get; }
         protected TContext Context { get; }
-        
-
-        public bool CanExit
-        {
-            get => _canExit && ChildStateMachine.CurrentState.CanExit;
-            protected set => _canExit = value;
-        }
 
         protected HierarchicalStateBase(TContext context, IState<TContext> initialState)
         {
@@ -32,7 +25,8 @@ namespace StateMachine
         {
             ChildStateMachine.FromState(from, transition);
         }
-       
+
+        public virtual bool CanExit() => true;
 
         protected virtual void OnEnter()
         {

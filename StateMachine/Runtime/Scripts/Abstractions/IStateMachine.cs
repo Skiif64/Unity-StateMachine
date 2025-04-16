@@ -6,6 +6,8 @@ namespace StateMachine.Abstractions
         IState<TContext> CurrentState { get; }
         void Init(IState<TContext> initialState);
         void Update();
+        void FixedUpdate();
+        void CheckTransitions();
         void SwitchState(IState<TContext> newState);
     }
 }

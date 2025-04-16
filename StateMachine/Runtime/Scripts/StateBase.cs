@@ -1,4 +1,3 @@
-using System;
 using StateMachine.Abstractions;
 
 namespace StateMachine
@@ -6,7 +5,6 @@ namespace StateMachine
     public abstract partial class StateBase<TContext> : IState<TContext>
     {
         protected TContext Context { get; }
-        public bool CanExit { get; protected set; } = true;
 
         protected StateBase(TContext context)
         {
@@ -27,6 +25,8 @@ namespace StateMachine
         public virtual void OnExit()
         {
         }
+
+        public virtual bool CanExit() => true;
     }
 
     public abstract class StateBase<TParent, TContext> : StateBase<TContext>, IState<TParent, TContext>

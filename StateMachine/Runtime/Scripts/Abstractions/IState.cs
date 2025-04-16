@@ -2,7 +2,7 @@ namespace StateMachine.Abstractions
 {
     public interface IState<TContext>
     {
-        bool CanExit { get; }
+        bool CanExit();
         void OnEnter();
         void OnUpdate();
         void OnFixedUpdate();

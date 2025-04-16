@@ -5,12 +5,25 @@ using StateMachine.Abstractions;
 
 namespace StateMachine
 {
-    public class StateMachine<TContext> : IStateMachine<TContext>
+    public class StateMachine<TContext> : IStateMachine<TContext>, IDisposable
     {
         private readonly HashSet<ITransition<TContext>> _anyTransition = new();
         private readonly ConcurrentDictionary<IState<TContext>, List<ITransition<TContext>>> _transitions = new();
         private readonly ConcurrentDictionary<Type, IState<TContext>> _states = new();
+        private readonly IStateMachineTicker _ticker;
+        private IDisposable _updateSubscription;
+        
         public IState<TContext> CurrentState { get; private set; } = StateBase<TContext>.Null;
+
+        public StateMachine(IStateMachineTicker ticker)
+        {
+            _ticker = ticker;
+        }
+
+        public StateMachine() : this(NullStateMachineTicker.Instance)
+        {
+            
+        }
 
         public void Init(IState<TContext> initialState)
         {
@@ -18,13 +31,17 @@ namespace StateMachine
         }
         public void Update()
         {
-            TryTransitions();
             CurrentState.OnUpdate();
         }
         
         public void FixedUpdate()
         {
             CurrentState.OnFixedUpdate();
+        }
+
+        public void CheckTransitions()
+        {
+            TryTransitions();
         }
         
         public void SwitchState(IState<TContext> newState)
@@ -81,16 +98,22 @@ namespace StateMachine
 
         private void TryTransitions()
         {
-            if (!CurrentState.CanExit) return;
-
             foreach (var transition in _anyTransition)
             {
                 if (CurrentState.Equals(transition.TransitionTo))
                 {
                     continue;    
                 }
-                
-                if (!transition.IsSatisfied(this)) continue;
+
+                if (!transition.IsSatisfied(this))
+                {
+                    continue;
+                }
+
+                if (!CurrentState.CanExit())
+                {
+                    return;
+                }
                 
                 SwitchState(transition.TransitionTo);
                 break;
@@ -108,6 +131,11 @@ namespace StateMachine
                 SwitchState(transition.TransitionTo);
                 break;
             }
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }
