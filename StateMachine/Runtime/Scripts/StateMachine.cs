@@ -101,6 +101,11 @@ namespace StateMachine
         {
             foreach (var transition in _anyTransition)
             {
+                if (CurrentState is IStateMachine<TContext> innerMachine) //TODO: use root ticker instead of type check
+                {
+                    innerMachine.CheckTransitions();
+                }
+                
                 if (CurrentState.Equals(transition.TransitionTo))
                 {
                     continue;    
@@ -127,7 +132,20 @@ namespace StateMachine
             
             foreach (var transition in currentTransitions)
             {
-                if (!transition.IsSatisfied(this)) continue;
+                if (CurrentState is IStateMachine<TContext> innerMachine) //TODO: use root ticker instead of type check
+                {
+                    innerMachine.CheckTransitions();
+                }
+                
+                if (!CurrentState.CanExit())
+                {
+                    return;
+                }
+                
+                if (!transition.IsSatisfied(this))
+                {
+                    continue;
+                }
                 
                 SwitchState(transition.TransitionTo);
                 break;
