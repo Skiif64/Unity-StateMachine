@@ -4,7 +4,6 @@ namespace StateMachine
 {
     public abstract class HierarchicalStateBase<TContext> : IState<TContext>, ITransitionable<TContext>
     {
-        private bool _canExit = true;
         protected StateMachine<TContext> ChildStateMachine { get; }
         protected IState<TContext> InitialState { get; }
         protected TContext Context { get; }
@@ -66,6 +65,12 @@ namespace StateMachine
         {
             OnExit();
             ChildStateMachine.Exit();
+        }
+
+        bool IState<TContext>.CanExit()
+        {
+            ChildStateMachine.CheckTransitions(); //TODO: not good to use can exit as inner state machine check
+            return CanExit();
         }
     }
 
