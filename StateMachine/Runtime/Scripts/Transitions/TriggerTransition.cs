@@ -2,7 +2,7 @@ using StateMachine.Abstractions;
 
 namespace StateMachine.Transitions
 {
-    public struct TriggerTransition<TContext> : ITransition<TContext>
+    public class TriggerTransition<TContext> : ITransition<TContext>
     {
         private bool _triggered;
         
